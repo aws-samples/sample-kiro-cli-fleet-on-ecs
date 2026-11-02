@@ -1,0 +1,10 @@
+{
+  "name": "kiro-fleet-mcp-servers",
+  "version": "0.0.0",
+  "private": true,
+  "description": "MCP servers the shipped workflows declare, pinned and installed into the worker image",
+  "license": "MIT-0",
+  "dependencies": {
+    "@modelcontextprotocol/server-sequential-thinking": "2026.8.31"
+  }
+}

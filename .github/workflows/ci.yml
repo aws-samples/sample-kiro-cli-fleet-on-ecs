@@ -1,0 +1,48 @@
+# The same gates, for anyone who keeps this on GitHub.
+#
+# As thin as the CodeBuild equivalent, and for the same reason: tools/ci.sh is the only place
+# the gates are defined, so what runs here is what runs on a laptop.
+name: gates
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# The gates only read the repository. Stated, so the token does not default to the
+# repository's broader setting.
+permissions:
+  contents: read
+
+jobs:
+  gates:
+    # An arm64 runner, because the worker image targets arm64 and building it under emulation
+    # produces an image that works and changes every timing it is later used to measure. On a
+    # runner that cannot match the target, pass `--arch x86_64` and change
+    # fleet:targetArchitecture to agree — the two must not disagree.
+    runs-on: ubuntu-24.04-arm
+
+    services:
+      # So the contention tests run rather than skip. They cover the claim protocol under real
+      # write races, which an in-process fake does not reproduce.
+      dynamodb:
+        image: amazon/dynamodb-local:latest
+        ports: ['8000:8000']
+
+    steps:
+      # Pinned to commit SHAs: a tag can be moved to different code after review, a commit
+      # cannot. The comment names the release the SHA belongs to.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5.4.2
+
+      - name: Run the gates
+        run: ./tools/ci.sh
+
+      # No push step. Where the image goes depends on the account this is wired into, and a
+      # workflow that assumed one would fail for everyone else. See buildspec.yml for the
+      # shape of it, and README for deploying by hand.

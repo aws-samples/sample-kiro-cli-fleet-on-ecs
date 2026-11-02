@@ -1,0 +1,8 @@
+{
+  "name": "convention-audit",
+  "description": "Audits one source file against the conventions carried in steering",
+  "promptFile": "prompt.md",
+  "trustTools": ["fs_read", "fs_write"],
+  "steering": true,
+  "expectsStdout": false
+}

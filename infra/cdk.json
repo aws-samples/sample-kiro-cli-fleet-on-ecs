@@ -1,0 +1,37 @@
+{
+  "app": "npx ts-node --prefer-ts-exts bin/app.ts",
+  "watch": {
+    "include": ["**"],
+    "exclude": ["README.md", "cdk*.json", "**/*.d.ts", "**/*.js", "tsconfig.json", "package*.json", "node_modules", "test"]
+  },
+  "context": {
+    "aws-cdk:enableDiffNoFail": "true",
+    "@aws-cdk/core:stackRelativeExports": "true",
+    "@aws-cdk/aws-iam:minimizePolicies": true,
+    "@aws-cdk/core:checkSecretUsage": true,
+    "@aws-cdk/core:target-partitions": ["aws"],
+
+    "//": "Fleet parameters. Defaults are deliberately small: a sample that cannot be deployed into a new account without a quota increase is a sample nobody runs.",
+    "//maxTasks": "maxTasks x taskCpu must stay within a new account's Fargate vCPU quota, which defaults to 6. 10 x 512 = 5 vCPU, leaving headroom for anything else in the account.",
+    "fleet:maxTasks": 10,
+    "fleet:taskCpu": 512,
+    "fleet:taskMemoryMiB": 2048,
+    "fleet:imageTag": "latest",
+    "fleet:containerInsights": true,
+    "//targetBacklogPerTask": "Queue items per running task that target tracking holds. Target tracking alone scales out only above the target, so at zero tasks it would never start a batch of this many items or fewer; the scaling function starts an idle fleet itself with ceil(visible / target) tasks, within maxTasks and the pool's concurrency.",
+    "fleet:targetBacklogPerTask": 2,
+    "//creditMargin": "Credits held back below each subscription's budget. Passed as CREDIT_MARGIN to both the workers, which refuse a claim at creditBudget - margin, and the scaling function, which counts only subscriptions below that line toward the fleet ceiling. Size it as 2 x C x p95(RunCredits) + 0.01; see the README's Credits section.",
+    "fleet:creditMargin": "1",
+    "fleet:workflowTimeoutSeconds": 900,
+    "fleet:targetArchitecture": "arm64",
+    "fleet:workspaceExpiryDays": 7,
+    "fleet:logRetentionDays": 30,
+    "//egressControl": "'private' = no internet route at all; every destination this workload needs has a VPC endpoint, including the Kiro service via the q endpoint. Costs nothing and is stronger than an allowlist. 'inspection' = NAT plus Network Firewall matching the domains below, for a workflow that needs the internet; ~$288/month standing even at zero tasks. 'open' = NAT and port 443 only, which is not destination control.",
+    "fleet:egressControl": "private",
+    "//kiroEgressDomains": "Measured from a capture of a credentialed run, not guessed. Only these two were contacted: runtime carries the model traffic, management the control plane. Telemetry and cognito-identity were also seen and are NOT required — blocking them still produced a successful run. prod.<region>.auth.desktop.kiro.dev was removed after the capture never contacted it: API-key authentication does not use the desktop login flow.",
+    "fleet:kiroEgressDomains": [
+      "management.us-east-1.kiro.dev",
+      "runtime.us-east-1.kiro.dev"
+    ]
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "name": "repo-file-summary",
+  "description": "Summarizes one source file into a fixed-format note under output/",
+  "promptFile": "prompt.md",
+  "trustTools": ["fs_read", "fs_write"],
+  "requiresMcpServers": ["sequentialthinking"],
+  "expectsStdout": true
+}

@@ -1,0 +1,7 @@
+# The worker image copies `workflows/` as code. A local `npm ci` in workflows/mcp-servers
+# leaves a node_modules tree there that git ignores; without this it would ride into the
+# image next to the lockfile-installed copy in /opt/mcp-servers.
+**/node_modules
+**/.venv
+**/__pycache__
+**/.DS_Store

@@ -1,0 +1,10 @@
+# uv for the CodeBuild install phase (buildspec.yml), pinned by version and hash.
+# pip refuses any wheel whose sha256 is not listed here, so a changed or replaced
+# release fails the build instead of running. Hashes are the Linux wheels from
+# https://pypi.org/project/uv/0.9.4/#files (aarch64 and x86_64, glibc and musl).
+# To upgrade: change the version and copy the new Linux wheel hashes from PyPI.
+uv==0.9.4 \
+    --hash=sha256:aa0e144df0276945cbe49e30b577cf51e19b808e5ca55e23b8a1a354857e1629 \
+    --hash=sha256:39f6b459fdabc80c0afc080ba8bce86e048afa799bc6c5c372f78b14195cf49c \
+    --hash=sha256:d89f88df09d571f6d06228b32a6a71100905eb64343247317d363bcd774ee870 \
+    --hash=sha256:c353be83686f769bf50e6c6bc8591ad59752b492c6bb51296e378e55521482f5

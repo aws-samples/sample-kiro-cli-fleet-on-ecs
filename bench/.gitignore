@@ -1,0 +1,10 @@
+# Benchmark output is a run artifact, not source. The committed artifact for the
+# blog lives in the post's own tree once measured, not here.
+results/
+
+# Python / tooling caches
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.venv/
