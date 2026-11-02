@@ -39,7 +39,9 @@ is_excluded() {
 # Each entry is "description|extended-regex".
 
 RULES=(
-    "AWS account number|(^|[^0-9])[0-9]{12}([^0-9]|$)"
+    # Bounded by non-alphanumerics, not just non-digits: twelve digits inside a hex
+    # digest (a pinned SHA-256) are not an account number.
+    "AWS account number|(^|[^0-9A-Za-z])[0-9]{12}([^0-9A-Za-z]|$)"
     "ARN containing an account number|arn:aws[a-z-]*:[a-z0-9-]*:[a-z0-9-]*:[0-9]{12}"
     "AWS access key id|(AKIA|ASIA)[0-9A-Z]{16}"
     "private key block|-----BEGIN [A-Z ]*PRIVATE KEY-----"
