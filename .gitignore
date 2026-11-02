@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
+
+# Node / CDK
+node_modules/
+cdk.out/
+*.js.map
+.cdk.staging/
+
+# Local environment — never commit real values
+.env
+.env.*
+!.env.example
+
+# Local scan rules: credential fingerprints and origin-specific terms.
+# Must stay untracked — see .secret-scan.local.example for why.
+.secret-scan.local
+
+# OS / editor
+.DS_Store
+*.swp
+
+# Benchmark output (regenerate; may contain account-specific identifiers)
+bench/out/
+
+# This repository's own Kiro configuration: the specs it was built from and the steering
+# that governed the build. Development artifacts, not part of what a reader deploys, and
+# they churn on every task. The released aws-samples/sample-kiro-flock ignores them too.
+#
+# Not to be confused with the steering a workflow carries as payload, which is committed:
+# see workflows/examples/*/steering/. That is the thing the pattern is about.
+.kiro/
+
+# Agent working files: investigation reports and run state. They cite the internal
+# system this sample was derived from, so they must never be published.
+.agents/
+.omc/

@@ -1,0 +1,61 @@
+# AWS CodeBuild, for anyone wiring this into CodePipeline.
+#
+# Deliberately thin: it installs what the gates need and calls one script. The gates
+# themselves live in tools/ci.sh so that they can be run on a laptop — a check that only
+# runs inside a pipeline is a check nobody runs before pushing.
+#
+# The image must be built on compute of the same architecture as the target, not under
+# emulation. An emulated build produces an image that works and changes every timing it is
+# later used to measure, which is the hard kind of wrong: nothing fails.
+#
+#   arm64 target  ->  ARM_CONTAINER, aarch64 standard image      (the default)
+#   x86_64 target ->  LINUX_CONTAINER, and pass --arch x86_64
+version: 0.2
+
+env:
+  variables:
+    # Must match fleet:targetArchitecture in infra/cdk.json. A mismatch is not an error at
+    # build time; it produces a fleet that runs emulated.
+    TARGET_ARCH: aarch64
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 22
+      python: 3.13
+    commands:
+      # Pinned by version and sha256, not a piped install script: the build runs what was
+      # reviewed, and a changed release fails here instead of running.
+      - python3 -m pip install --user --no-deps --require-hashes -r tools/uv-requirements.txt
+      - export PATH="$HOME/.local/bin:$PATH"
+
+  pre_build:
+    commands:
+      # DynamoDB Local, so the contention tests run rather than skip. They are the ones that
+      # cover the claim protocol under real write races, which an in-process fake does not
+      # reproduce — so without this the suite passes while the interesting case is untested.
+      - docker run -d --rm -p 8000:8000 amazon/dynamodb-local:latest
+        -jar DynamoDBLocal.jar -inMemory -sharedDb
+      - timeout 60 sh -c 'until curl -fsS -o /dev/null http://localhost:8000; do sleep 2; done'
+
+  build:
+    commands:
+      - export PATH="$HOME/.local/bin:$PATH"
+      - ./tools/ci.sh --arch "$TARGET_ARCH"
+
+  post_build:
+    commands:
+      # Push only from the default branch, and tag with the commit as well as `latest`, so a
+      # deployed task definition can be traced to the source that produced it.
+      - |
+        if [ "$CODEBUILD_WEBHOOK_HEAD_REF" = "refs/heads/main" ] || [ -z "$CODEBUILD_WEBHOOK_HEAD_REF" ]; then
+          aws ecr get-login-password | docker login --username AWS --password-stdin \
+              "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
+          REPO="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"
+          docker tag kiro-fleet-worker:latest "${REPO}:latest"
+          docker tag kiro-fleet-worker:latest "${REPO}:${CODEBUILD_RESOLVED_SOURCE_VERSION}"
+          docker push "${REPO}:latest"
+          docker push "${REPO}:${CODEBUILD_RESOLVED_SOURCE_VERSION}"
+        else
+          echo "Not the default branch; the image was built and verified but not pushed."
+        fi

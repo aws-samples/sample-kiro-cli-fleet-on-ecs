@@ -1,0 +1,32 @@
+{
+  "name": "kiro-fleet-infra",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT-0",
+  "description": "Infrastructure for running headless Kiro CLI workflows on Amazon ECS",
+  "bin": {
+    "infra": "bin/app.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "jest",
+    "synth": "cdk synth",
+    "deploy": "cdk deploy --all",
+    "destroy": "cdk destroy --all"
+  },
+  "devDependencies": {
+    "@types/jest": "30.0.0",
+    "@types/node": "22.10.2",
+    "aws-cdk": "2.1146.1",
+    "cdk-nag": "2.38.2",
+    "jest": "30.5.2",
+    "ts-jest": "29.4.15",
+    "ts-node": "10.9.2",
+    "typescript": "5.7.2"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.274.0",
+    "constructs": "10.8.1"
+  }
+}

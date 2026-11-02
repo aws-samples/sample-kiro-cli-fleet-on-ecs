@@ -1,0 +1,36 @@
+[project]
+name = "leaseclient"
+version = "0.1.0"
+description = "Allocates Kiro subscriptions from a governed pool to headless worker tasks."
+readme = "README.md"
+requires-python = ">=3.12,<3.15"
+license = { text = "MIT-0" }
+
+# Version ranges here express compatibility; uv.lock pins the exact resolved
+# versions and is committed. Reproducibility comes from the lockfile, so install
+# with `uv sync --frozen` rather than resolving afresh.
+dependencies = [
+    "boto3>=1.40,<2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "moto[dynamodb,secretsmanager]>=5.1,<6",
+    "pytest>=9.0.3,<10",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["leaseclient", "runner", "reconciler", "seeding", "scaling", "usagereport", "taskstopped"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# -r a reports the reason for every skip and xfail: a silently skipped
+# concurrency test would hide the property this package exists to provide.
+addopts = "-ra --strict-markers --strict-config"
+markers = [
+    "contention: exercises concurrent claimants; must use real threads",
+]

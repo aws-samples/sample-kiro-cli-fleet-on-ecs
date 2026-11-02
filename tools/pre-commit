@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+#
+# Blocks a commit that would put an unpublishable value into history.
+#
+# Not installed automatically, because activating it changes git configuration.
+# To enable, from the repository root:
+#
+#   git config core.hooksPath tools
+#
+# To bypass for a single commit, if you are certain a finding is a false positive:
+#
+#   git commit --no-verify
+#
+# Prefer narrowing a rule over bypassing the hook. A value committed once stays
+# reachable in history even after a later commit removes it.
+
+set -euo pipefail
+
+printf 'Scanning for values that must not be published...\n'
+
+if ! ./tools/scan-secrets.sh; then
+    printf '\nCommit refused.\n' >&2
+    exit 1
+fi

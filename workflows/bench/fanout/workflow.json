@@ -1,0 +1,8 @@
+{
+  "name": "bench-fanout",
+  "description": "M2~M5 load item: an orchestrator delegates 30 notes under ./input to two subagents and writes ./output/final.md",
+  "promptFile": "prompt.md",
+  "trustTools": ["read", "write", "subagent"],
+  "requiresMcpServers": [],
+  "expectsStdout": true
+}

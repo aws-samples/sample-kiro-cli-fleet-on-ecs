@@ -1,0 +1,11 @@
+node_modules/
+cdk.out/
+*.d.ts
+*.js
+!jest.config.js
+.cdk.staging/
+
+# Written by `cdk synth` when a stack has an environment, and it caches the account
+# number it looked up against. Nothing here is needed to build: the lookups happen again
+# on any machine. Committing it would put an account number in a public repository.
+cdk.context.json
