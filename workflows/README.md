@@ -2,8 +2,15 @@
 
 What an author provides, and what the fleet guarantees in return.
 
-A workflow is data, not code. It ships in this repository, is baked into the worker image, and is
-checksummed onto that image, so the prompt that produced a result can be identified from the result.
+A workflow is data, not code. It ships in this repository and is baked into the worker image, which carries
+a checksum of the `workflows/` directory as the `dev.kiro.workflows.checksum` label. That pins down the tool
+grant, MCP servers, and steering a task ran with.
+
+The prompt is the exception. On the fleet, each work item carries its own prompt, which the seeding
+function copies from the manifest (see [Seeding a batch](../README.md#seeding-a-batch)). The `prompt.md`
+in a workflow directory is that workflow's reference prompt: a local run (`runner.local_batch --workflow`)
+uses it directly, and for a fleet batch you put the same text in the manifest's `prompt`. So the prompt
+behind a result is the one in the manifest that seeded it. Keep the manifest with the results.
 
 ## The contract
 
@@ -18,7 +25,8 @@ The fleet gives a workflow:
 A workflow gives the fleet:
 
 - a `workflow.json` declaring what it needs
-- a prompt that names where output goes
+- a reference prompt (`prompt.md`) that names where output goes, which the manifest's `prompt` carries on
+  the fleet
 - output under `./output`, or a failure
 
 Paths are relative, always. That is what lets the same workflow run on a laptop and on a task without
@@ -57,6 +65,9 @@ subscription key in the pool and overwrite any result. See [Security](../README.
 
 `expectsStdout` says whether an empty answer counts as a failure. A workflow that only writes files can set
 it false.
+
+`promptFile` names the reference prompt. A task checks at start that it exists and is not empty, but runs
+the prompt its work item carries; only a local run reads the file as its prompt.
 
 ## `steering/`
 
@@ -120,3 +131,12 @@ Create a directory with `workflow.json`, the prompt it names, `steering/` if it 
 `mcp.json` if it needs servers. Keep the
 prompt explicit about the output path: a prompt that does not say where to write produces a run that writes
 nowhere, and the completion check will call that a failure, correctly.
+
+To run it on the fleet, build a manifest from the reference prompt so the two cannot drift apart:
+
+```bash
+jq -Rs '{inputPrefix: "inputs/", prompt: .}' workflows/<your-workflow>/prompt.md > manifest.json
+```
+
+Then upload the inputs and the manifest as in [Seeding a batch](../README.md#seeding-a-batch), and deploy
+with `-c fleet:workflowPath=<path under workflows/>` so the image runs this workflow's definition.

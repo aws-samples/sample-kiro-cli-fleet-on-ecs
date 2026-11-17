@@ -30,7 +30,12 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Final, Protocol
 
-from runner.workflow import _LONG_TOKEN, _child_environment, strip_ansi
+from runner.workflow import (
+    _LONG_TOKEN,
+    AGENT_ENGINE_ARGS,
+    _child_environment,
+    strip_ansi,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -111,7 +116,7 @@ class UsageProbe:
 
     def read(self, api_key: str) -> UsageReading | UsageFailure:
         (self._scratch / "tmp").mkdir(parents=True, exist_ok=True)
-        command = [self._executable, "chat", "--no-interactive", "/usage"]
+        command = [self._executable, "chat", *AGENT_ENGINE_ARGS, "--no-interactive", "/usage"]
         try:
             completed = subprocess.run(
                 command,

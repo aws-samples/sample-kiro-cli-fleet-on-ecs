@@ -29,12 +29,24 @@ uv run --frozen python -m runner.local_batch \
     --keep
 ```
 
-`--workflow` drives the run from this directory's `workflow.json`, so the prompt, the tool grant, and the
-MCP servers are the ones a task would use rather than a command line that resembles them. `--input-dir`
-seeds one work item per file, which is the shape fan-out work has.
+`--workflow` drives the run from this directory's `workflow.json`, so the tool grant and the MCP servers are
+the ones a task would use rather than a command line that resembles them. The prompt is `prompt.md`, the
+reference prompt that a fleet manifest carries. `--input-dir` seeds one work item per file, which is the
+shape fan-out work has.
 
 Requires `KIRO_API_KEY` in the environment for a real run; without it the local runner substitutes a
 stand-in workflow and says so.
+
+## Running it on the fleet
+
+This is the workflow the fleet deploys by default. A task runs the prompt its work item carries, so build
+the manifest from `prompt.md`:
+
+```bash
+jq -Rs '{inputPrefix: "inputs/", prompt: .}' workflows/examples/repo-file-summary/prompt.md > manifest.json
+```
+
+Then seed it as in [Seeding a batch](../../../README.md#seeding-a-batch).
 
 ## What a good result looks like
 

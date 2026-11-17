@@ -343,3 +343,49 @@ class TestTheCreditFigureAsTheCliActuallyPrintsIt:
         assert last_line(f"first\n\x1b[31mtoken {token}\x1b[0m\n\n") == "token <REDACTED>"
         assert len(last_line("x" * 30 + " " + "y " * 300)) == 200
         assert last_line("") == ""
+
+
+class TestTheAgentEngineIsPinned:
+    """Every `kiro-cli chat` the worker starts names the V2 engine.
+
+    Kiro CLI 3.0 made V3 the default, and under V3 `/usage` is sent to the model instead of
+    being answered by the client, so credit tracking reads nothing. Headless runs still take
+    V2 unless a `chat.agentEngine` setting says otherwise; the flag keeps that setting from
+    deciding.
+    """
+
+    def test_a_workflow_run_names_the_engine(self, tmp_path, monkeypatch) -> None:
+        import subprocess
+
+        from runner import workflow as module
+
+        seen: list[list[str]] = []
+
+        def capture(command, *args, **kwargs):
+            seen.append(list(command))
+            raise FileNotFoundError("kiro-cli")
+
+        monkeypatch.setattr(subprocess, "run", capture)
+        module.run_workflow(prompt="go", api_key="k", workspace=tmp_path, trust_tools="write")
+
+        command = seen[0]
+        assert command[command.index("--agent-engine") + 1] == "v2"
+        assert command.index("--agent-engine") < command.index("go")
+
+    def test_the_usage_probe_names_the_engine(self, tmp_path, monkeypatch) -> None:
+        import subprocess
+
+        from runner.usage import UsageProbe
+
+        seen: list[list[str]] = []
+
+        def capture(command, *args, **kwargs):
+            seen.append(list(command))
+            raise FileNotFoundError("kiro-cli")
+
+        monkeypatch.setattr(subprocess, "run", capture)
+        UsageProbe(tmp_path).read("k")
+
+        command = seen[0]
+        assert command[command.index("--agent-engine") + 1] == "v2"
+        assert command[-1] == "/usage"

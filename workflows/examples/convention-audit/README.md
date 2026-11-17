@@ -93,3 +93,14 @@ the runner takes a bare `--prompt` and no steering reaches the CLI at all.
 
 Needs `KIRO_API_KEY` for a real run; without one the runner substitutes a stand-in and says so, which
 exercises the loop and the input staging but not the CLI.
+
+## Running it on the fleet
+
+Deploy with `-c fleet:workflowPath=examples/convention-audit`, so the image seeds this workflow's steering.
+A task runs the prompt its work item carries, so build the manifest from `prompt.md`:
+
+```bash
+jq -Rs '{inputPrefix: "inputs/", prompt: .}' workflows/examples/convention-audit/prompt.md > manifest.json
+```
+
+Then seed it as in [Seeding a batch](../../../README.md#seeding-a-batch).
