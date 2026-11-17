@@ -71,14 +71,24 @@ if ! curl -fsS -o /dev/null --max-time 2 http://localhost:8000 2>/dev/null; then
     printf '        -jar DynamoDBLocal.jar -inMemory -sharedDb\n'
 fi
 
-# --- 3. the infrastructure ---------------------------------------------------
+# --- 3. the benchmark harness ------------------------------------------------
+#
+# The harness produces the figures the blog post reports, so it is held to the same gate as
+# the worker. Its tests need no network, credential, or Kiro CLI: they drive the ramp and the
+# load generator with fakes.
+
+stage 'Benchmark tests'
+(cd bench && uv sync --frozen --extra dev >/dev/null && uv run --frozen pytest -q) \
+    || fail 'benchmark tests'
+
+# --- 4. the infrastructure ---------------------------------------------------
 #
 # `npm ci` rather than `npm install`, for the same reason as `--frozen` above.
 
 stage 'Infrastructure tests'
 (cd infra && npm ci --silent && npx tsc --noEmit && npx jest) || fail 'infrastructure tests'
 
-# --- 4. the image ------------------------------------------------------------
+# --- 5. the image ------------------------------------------------------------
 #
 # Last because it is the slowest, and because everything above can fail without a Docker
 # daemon being involved.

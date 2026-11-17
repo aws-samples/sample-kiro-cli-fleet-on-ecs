@@ -44,6 +44,14 @@ OUTPUT_DIR: Final = "output"
 
 DEFAULT_TIMEOUT_SECONDS: Final = 900
 
+# Every `kiro-cli chat` the worker starts names its agent engine. Kiro CLI 3.0 made V3 the
+# default, and a `chat.agentEngine = "v3"` setting applies even with `--no-interactive`.
+# Under V3, `/usage` reaches the model as a prompt instead of being answered by the client,
+# so no Credits line comes back, and `--trust-tools` names differ. Without a setting,
+# headless runs still take V2 (checked on 3.3.0), so this changes nothing today; it stops a
+# configuration change from silently breaking credit tracking. 2.30.0 accepts the flag.
+AGENT_ENGINE_ARGS: Final = ("--agent-engine", "v2")
+
 
 MCP_STARTUP_FAILED_EXIT: Final = 3
 """What the CLI returns when --require-mcp-startup is set and a server does not start.
@@ -276,6 +284,7 @@ def run_workflow(
     command = [
         executable,
         "chat",
+        *AGENT_ENGINE_ARGS,
         "--no-interactive",
         "--require-mcp-startup",
         f"--trust-tools={trust_tools}",
