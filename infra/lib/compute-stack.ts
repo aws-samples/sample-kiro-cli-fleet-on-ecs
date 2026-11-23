@@ -389,7 +389,7 @@ export class ComputeStack extends Stack {
       // Scale-in stops whichever unprotected tasks the scheduler picks, without regard to the
       // subscription they hold. A worker is protected from scale-in while it holds a work item,
       // so a task stopped this way holds none, unless ECS refused that item's protection
-      // request (README, "Scale-in and the item in progress"). It receives SIGTERM and returns
+      // request (docs/scale-in.md). It receives SIGTERM and returns
       // its lease, so the capacity comes back immediately instead of waiting out the lease.
       //
       // No capacity provider strategy: see the cluster above for why, which is about teardown

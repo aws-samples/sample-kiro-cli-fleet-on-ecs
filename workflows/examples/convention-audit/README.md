@@ -103,4 +103,4 @@ A task runs the prompt its work item carries, so build the manifest from `prompt
 jq -Rs '{inputPrefix: "inputs/", prompt: .}' workflows/examples/convention-audit/prompt.md > manifest.json
 ```
 
-Then seed it as in [Seeding a batch](../../../README.md#seeding-a-batch).
+Then seed it as in [Seeding a batch](../../../docs/deploying.md#seeding-a-batch).

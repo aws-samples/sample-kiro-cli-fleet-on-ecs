@@ -159,7 +159,7 @@ describe('dimension values the dashboard draws', () => {
  *
  * The stack passes `CREDIT_MARGIN` to the workers and to the scaling function. Its fallback and
  * the value in `cdk.json` must be the worker's own `DEFAULT_CREDIT_MARGIN`, or deploying the
- * stack would quietly change the margin the README documents.
+ * stack would quietly change the margin docs/credits.md documents.
  */
 describe('the credit margin default', () => {
   const claimSource = read(joinPath(__dirname, '../../worker/leaseclient/claim.py'), 'utf8');

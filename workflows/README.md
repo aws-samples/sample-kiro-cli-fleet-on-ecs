@@ -7,7 +7,7 @@ a checksum of the `workflows/` directory as the `dev.kiro.workflows.checksum` la
 grant, MCP servers, and steering a task ran with.
 
 The prompt is the exception. On the fleet, each work item carries its own prompt, which the seeding
-function copies from the manifest (see [Seeding a batch](../README.md#seeding-a-batch)). The `prompt.md`
+function copies from the manifest (see [Seeding a batch](../docs/deploying.md#seeding-a-batch)). The `prompt.md`
 in a workflow directory is that workflow's reference prompt: a local run (`runner.local_batch --workflow`)
 uses it directly, and for a fleet batch you put the same text in the manifest's `prompt`. So the prompt
 behind a result is the one in the manifest that seeded it. Keep the manifest with the results.
@@ -58,7 +58,7 @@ separate security setting.
 Every tool in `trustTools` runs with the task role, because the agent shares the worker's container and
 user. Do not add `shell` (`execute_bash` in older CLI versions) to a workflow whose inputs you did not
 produce yourself: input content can steer the agent, and a trusted shell can use the role to read every
-subscription key in the pool and overwrite any result. See [Security](../README.md#security).
+subscription key in the pool and overwrite any result. See [Security](../docs/security.md).
 
 `requiresMcpServers` names servers that must be present in `mcp.json`. The run always uses
 `--require-mcp-startup`, so a missing server fails the task at start rather than part way through.
@@ -138,5 +138,5 @@ To run it on the fleet, build a manifest from the reference prompt so the two ca
 jq -Rs '{inputPrefix: "inputs/", prompt: .}' workflows/<your-workflow>/prompt.md > manifest.json
 ```
 
-Then upload the inputs and the manifest as in [Seeding a batch](../README.md#seeding-a-batch), and deploy
+Then upload the inputs and the manifest as in [Seeding a batch](../docs/deploying.md#seeding-a-batch), and deploy
 with `-c fleet:workflowPath=<path under workflows/>` so the image runs this workflow's definition.

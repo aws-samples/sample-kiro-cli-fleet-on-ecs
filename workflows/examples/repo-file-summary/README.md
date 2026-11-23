@@ -46,7 +46,7 @@ the manifest from `prompt.md`:
 jq -Rs '{inputPrefix: "inputs/", prompt: .}' workflows/examples/repo-file-summary/prompt.md > manifest.json
 ```
 
-Then seed it as in [Seeding a batch](../../../README.md#seeding-a-batch).
+Then seed it as in [Seeding a batch](../../../docs/deploying.md#seeding-a-batch).
 
 ## What a good result looks like
 

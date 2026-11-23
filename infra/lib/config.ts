@@ -89,8 +89,8 @@ export interface FleetConfig {
    * `parse_credit_margin` in `worker/leaseclient/claim.py`. If the two disagreed, a scaler with
    * the smaller margin would start tasks that exit without work for that band of credits.
    *
-   * The default is the worker's `DEFAULT_CREDIT_MARGIN`, which a test pins. See the README's
-   * Credits section for how to size it from `RunCredits`.
+   * The default is the worker's `DEFAULT_CREDIT_MARGIN`, which a test pins. See
+   * docs/credits.md for how to size it from `RunCredits`.
    */
   readonly creditMargin: string;
 
