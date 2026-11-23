@@ -306,7 +306,7 @@ class Worker:
                     logger.info("queue drained after %d items", report.completed)
                     # A pre-item reading was taken one long-poll ago, so the
                     # drain-end reading usually repeats it. It is kept, best-effort:
-                    # scale-in can stop the task before it runs (README, "Credits").
+                    # scale-in can stop the task before it runs (docs/credits.md).
                     return True
                 continue
             idle = 0
